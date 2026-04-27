@@ -12,3 +12,7 @@ result = app.invoke({
 
 print(result["draft"])
 
+# En tu main.py, después de 'app = build_graph()'
+print("\n--- ESTRUCTURA DEL GRAFO ---")
+app.get_graph().print_ascii()
+print("------------------------------\n")

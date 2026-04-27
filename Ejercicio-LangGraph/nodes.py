@@ -19,9 +19,19 @@ def planner(state: State):
     print("--- NODO: PLANNER ---")
     
     prompt = [
-        SystemMessage(content="""Eres un planificador experto. 
-        Analiza la pregunta del usuario y decide si necesitas buscar información externa para dar una respuesta precisa y actualizada.
-        Responde estrictamente con una palabra: 'YES' si necesitas investigar, o 'NO' si puedes responder con total seguridad."""),
+        SystemMessage(content="""Eres un planificador de investigación de élite. 
+        Tu misión es determinar si la pregunta requiere datos externos para garantizar una respuesta de máxima calidad en 2026.
+
+        DEBES responder 'YES' si la pregunta:
+        1. Menciona librerías, frameworks o software (ej. LangGraph, OpenAI, Python).
+        2. Requiere datos técnicos, ejemplos de código o versiones actualizadas.
+        3. Trata sobre temas que cambian con frecuencia.
+        
+        Solo responde 'NO' si es un saludo, una pregunta de lógica básica o un concepto que no ha cambiado en décadas.
+        
+        Ante la duda, elige siempre 'YES'.
+        Responde ESTRICTAMENTE con una palabra: 'YES' o 'NO'."""),
+        
         HumanMessage(content=state["question"])
     ]
 
@@ -38,7 +48,6 @@ def planner(state: State):
     return {
         "messages": [response], 
         "needs_research": needs_research, # Update state with the planner's decision
-        "iterations": state["iterations"] + 1 
     }
 
 def researcher(state: State):
@@ -59,7 +68,6 @@ def researcher(state: State):
 
     return {
         "research_notes": search_results, # Update state with research findings
-        "iterations": state["iterations"] + 1 
     }
 
 def drafter(state: State):
@@ -118,5 +126,4 @@ def reviewer(state: State):
     
     return {
         "approved": approved,
-        "iterations": state["iterations"] + 1
     }
