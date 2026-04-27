@@ -1,0 +1,21 @@
+# Entorno virtual
+.venv/
+env/
+venv/
+
+# UV
+.uv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Variables de entorno (Seguridad)
+.env
+.env.local
+
+# IDEs
+.vscode/
+.idea/
