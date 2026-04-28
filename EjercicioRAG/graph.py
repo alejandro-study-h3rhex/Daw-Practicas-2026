@@ -15,7 +15,7 @@ workflow.add_edge(START, "agent")
 
 workflow.add_conditional_edges(
     "agent",
-    tools_condition, # Función prebuilt: si hay tool_calls va a "retrieve", si no a END
+    tools_condition,
     {
         "tools": "retrieve",
         "__end__": END,
@@ -26,8 +26,8 @@ workflow.add_conditional_edges(
     "retrieve",
     grade_documents,
     {
-        "generate": "generate", # Si la función devuelve "generate", ve al nodo "generate"
-        "rewrite": "rewrite",   # Si la función devuelve "rewrite", ve al nodo "rewrite"
+        "generate": "generate",
+        "rewrite": "rewrite", 
     }
 )
 workflow.add_edge("rewrite", "agent")

@@ -32,7 +32,7 @@ GRADE_PROMPT = (
 )
 
 
-grader_model = init_chat_model("gpt-5.4", temperature=0)
+grader_model = init_chat_model("gpt-4o-mini", temperature=0)
 
 
 def grade_documents(

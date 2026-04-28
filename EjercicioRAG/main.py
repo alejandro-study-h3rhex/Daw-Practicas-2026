@@ -1,7 +1,9 @@
 from graph import app
 from langchain_core.messages import HumanMessage
+from dotenv import load_dotenv
 
 def run_agentic_rag(query: str):
+    load_dotenv()
     inputs = {"messages": [("user", query)]}
     print(f"--- INICIANDO AGENTIC RAG ---")
     
@@ -16,6 +18,7 @@ def run_agentic_rag(query: str):
         last_message = final_output["messages"][-1]
         print("\n--- RESPUESTA FINAL ---")
         print(last_message.content)
+        print("\n--- FIN DEL AGENTIC RAG ---")
 
 if __name__ == "__main__":
     run_agentic_rag("What are the two main categories of reward hacking according to Lilian Weng?")
