@@ -1,0 +1,21 @@
+{
+  "name": "Ejercicio Web Stack II",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  
+  // HEMOS QUITADO LA SECCIÓN "features"
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "dsznajder.es7-react-js-snippets",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "ms-python.black-formatter"
+      ]
+    }
+  },
+  "remoteUser": "vscode" 
+}

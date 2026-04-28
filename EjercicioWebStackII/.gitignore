@@ -1,0 +1,71 @@
+# --- OS Específicos ---
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+desktop.ini
+
+# --- Frontend (React + Node + Vite) ---
+node_modules/
+dist/
+dist-ssr
+*.local
+.eslintcache
+package-lock.json
+# Si prefieres usar yarn o pnpm:
+yarn-error.log
+pnpm-debug.log
+
+# --- Backend (Python + FastAPI) ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- Base de Datos & Alembic ---
+# No ignoramos las migraciones (.py), pero sí archivos temporales
+backend/alembic/versions/*.pyc
+# Si usas SQLite para pruebas rápidas localmente:
+*.db
+*.sqlite3
+
+# --- Variables de Entorno (CRÍTICO) ---
+# Nunca subas tus llaves secretas o contraseñas de DB
+.env
+.env.local
+.env.*.local
+
+# --- Herramientas de Desarrollo & Editores ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- Docker & DevContainers ---
+.devcontainer/.venv/

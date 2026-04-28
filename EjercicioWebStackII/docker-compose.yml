@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: "12345"
+      POSTGRES_DB: project_db
+    ports:
+      - "5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      # El punto (.) significa: "la carpeta donde está este archivo"
+      # Esto mapeará tu ejercicio actual a /workspace dentro del contenedor
+      - .:/workspace:cached
+    command: sleep infinity
+    network_mode: service:db
