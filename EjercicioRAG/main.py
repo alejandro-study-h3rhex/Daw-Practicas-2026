@@ -1,14 +1,20 @@
 from graph import app
 from langchain_core.messages import HumanMessage
+from langfuse.langchain import CallbackHandler
 from dotenv import load_dotenv
 
+
 def run_agentic_rag(query: str):
+    langfuse_handler = CallbackHandler()
+
+
     load_dotenv()
     inputs = {"messages": [("user", query)]}
+    config = {"callbacks": [langfuse_handler]}
     print(f"--- INICIANDO AGENTIC RAG ---")
     
     final_output = None
-    for output in app.stream(inputs, stream_mode="updates"):
+    for output in app.stream(inputs, stream_mode="updates", config=config):
         for node, value in output.items():
             print(f"\n[Nodo Finalizado: {node}]")
             final_output = value # Guardamos el último valor generado

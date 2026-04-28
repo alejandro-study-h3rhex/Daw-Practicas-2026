@@ -1,45 +1,60 @@
-# Agentic RAG: Recuperación con Autocorrección
+# 🤖 Agentic RAG: Investigador Autónomo con LangGraph
 
-## Orquestado con LangGraph & OpenAI
-Este ejercicio implementa un flujo de Generación Aumentada por Recuperación (RAG) de tipo agéntico. A diferencia de un RAG lineal, este sistema utiliza un bucle de retroalimentación para validar la relevancia de los documentos y reescribir consultas si la búsqueda inicial falla.
+Este proyecto implementa un sistema de **Generación Aumentada por Recuperación (RAG) Agéntica**. A diferencia de los flujos lineales, este agente es capaz de razonar, validar la calidad de la información recuperada y corregir su propia estrategia de búsqueda si los resultados no son satisfactorios.
 
-## Arquitectura del Sistema
-El flujo sigue una lógica de grafo cíclico donde la IA actúa como su propio supervisor de calidad.
+## 🚀 Flujo de Trabajo (Grafo Cíclico)
+El sistema utiliza un grafo de estados diseñado en **LangGraph** que permite la recursividad y la toma de decisiones en tiempo real.
 
-<img src="docs/graph.png" width=800px style="border-radius:20px;"/>
+<img src="docs/graph.png" width="400px" style="border-radius: 10px"/>
 
-### Descripción de los Nodos
+### Nodos del Sistema:
+* **Agent (Planner)**: El LLM decide si la consulta requiere una búsqueda externa.
+* **Retrieve (Tool)**: Recupera información semántica de la base de datos vectorial (Blogs de Lilian Weng).
+* **Grader (Evaluador)**: Un filtro crítico que decide si los documentos son útiles. Si no lo son, redirige el flujo a *Rewrite*.
+* **Rewrite**: Optimiza la consulta original para una búsqueda más precisa.
+* **Generate**: Sintetiza la respuesta final basándose exclusivamente en el contexto validado.
 
-1.  **Agent (Planner)**: Recibe la pregunta del usuario y decide si necesita consultar fuentes externas mediante la herramienta de búsqueda.
-2.  **Retrieval Tool**: Recupera fragmentos de información (chunks) utilizando modelos de **Embeddings** de OpenAI y una base de datos vectorial.
-3.  **Grader (Evaluador)**: Un nodo crítico que actúa como filtro de calidad. Determina si los documentos recuperados son realmente relevantes para la pregunta.
-4.  **Rewrite**: Si el Grader detecta que la información no es útil, el sistema reescribe la pregunta original para intentar una búsqueda más precisa y vuelve al nodo del Agente.
-5.  **Generate**: Una vez validada la relevancia, el LLM (`gpt-4o-mini`) sintetiza la respuesta final basándose exclusivamente en el contexto verificado.
+---
 
-## Estructura del Código
-Para entender cómo está construido, estas son las piezas fundamentales:
+## 🔍 Observabilidad y Calidad (Langfuse)
 
-1. **tools.py:** Configuración de los documentos, el VectorStore y la herramienta de recuperación.
+Para garantizar la fiabilidad del sistema, hemos integrado **Langfuse Cloud** para la trazabilidad completa y evaluación de resultados.
 
-2. **nodes.py:** Contiene las funciones lógicas de cada nodo (Agent, Grader, Rewriter, Generator).
+### Métricas de Rendimiento (Basado en trazas reales):
+| Métrica | Valor Promedio |
+| :--- | :--- |
+| **Latencia Total** | ~7.78 segundos (con flujo completo) |
+| **Costo por Consulta** | $0.000155 USD (Eficiencia máxima) |
+| **Modelo** | gpt-4o-mini-2024-07-18 |
 
-3. **state.py:** Define el esquema del estado que viaja por el grafo (una lista de mensajes).
+### LLM-as-a-Judge
+Utilizamos un evaluador automático de **Helpfulness** en la nube que puntúa las respuestas de 0 a 1, analizando la precisión, el tono y la claridad de la generación final frente a la duda original del usuario.
 
-4. **graph.py:** El "plano" donde se conectan los nodos mediante aristas condicionales1.
+---
 
-5. **main.py:** Script de ejecución para realizar consultas.
+## 🛠️ Instalación y Uso
 
-## Ejemplo de "Pensamiento" del Agente
-```
---- INICIANDO AGENTIC RAG ---
-1. [NODO: agent] -> "Necesito buscar sobre reward hacking."
-2. [NODO: retrieve] -> Recuperando documentos...
-3. [NODO: grader] -> RELEVANCIA: NO (El contenido no es suficientemente claro).
-4. [NODO: rewrite] -> "Reformulando pregunta para ser más específico..."
-5. [NODO: agent] -> Nueva búsqueda con pregunta optimizada.
-6. [NODO: grader] -> RELEVANCIA: SÍ (¡Encontrado!).
-7. [NODO: generate] -> Generando respuesta basada en evidencia.
+1. **Clonar y configurar**:
+   ```bash
+   pip install -r requirements.txt
 
---- RESPUESTA FINAL ---
-The two main categories of reward hacking according to Lilian Weng are environment and goal.
-```
+## Variables de Entorno: Crear un archivo .env con:
+~~~
+OPENAI_API_KEY="tu_key"
+LANGFUSE_PUBLIC_KEY="tu_key"
+LANGFUSE_SECRET_KEY="tu_key"
+LANGFUSE_HOST="[https://cloud.langfuse.com](https://cloud.langfuse.com)"
+~~~
+
+## Ejecutar:
+ ```python main.py```
+
+
+---
+
+### ¿Por qué este cambio es mejor?
+* **Prueba social**: Los datos de latencia y costo sacados de tu JSON le dan mucha credibilidad.
+* **Claridad**: Usas los nombres exactos de los nodos que aparecen en el código y en Langfuse.
+* **Visual**: La imagen del grafo real (`langfuse_graph`) vende mucho mejor el concepto de "Agentic" que cualquier texto.
+
+<img src="docs/langfuse_graph.png" title="langfuse_graph"/>
