@@ -20,17 +20,19 @@ export function ProjectManager() {
         delProject,
         addTaskToProject,    // Función del hook
         delTaskFromProject,  // Función del hook
-        toggleTaskStatus     // Función del hook
+        toggleTaskStatus,    // Función del hook
+        updateTaskToProject  // Función del hook
     } = useProjects();
 
     useEffect(() => {
         getProjects();
-    });
+    }, []);
 
     const selectedProject = projects.find(p => p.id === selectedProjectId);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showAddTaskForm, setShowAddTaskForm] = useState(false);
+    const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
 
     // --- MANEJO DE TAREAS SIMPLIFICADO ---
 
@@ -64,75 +66,96 @@ export function ProjectManager() {
         }
     };
 
+    const handleEditTask = async (taskId: number, titulo: string, descripcion?: string, fecha_inicio?: string, fecha_limite?: string) => {
+        if (selectedProjectId) {
+            await updateTaskToProject(selectedProjectId, taskId, {
+                titulo,
+                descripcion,
+                fecha_inicio,
+                fecha_limite
+            });
+            setEditingTask(undefined);
+        }
+    };
+
     return (
-        <div className="flex w-full flex-col items-start justify-between gap-6 md:flex-row p-6">
-            {/* COLUMNA IZQUIERDA */}
-            <div className="flex flex-col gap-4 w-full md:w-64">
+        <div className="grid grid-cols-[280px_600px_320px] gap-6 bg-background">
+
+            {/* COLUMNA IZQUIERDA (Pequeña) */}
+            <div className="flex flex-col">
                 <ProjectForm
                     show={showAddForm}
                     onClose={() => setShowAddForm(false)}
-                    onAddProject={(titulo, precio, tipo) => {
-                        addProject({ titulo, precio, tipo, tareas: [] });
+                    onAddProject={(titulo, precio, tipo, fecha_inicio, fecha_fin) => {
+                        addProject({ titulo, precio, tipo, tareas: [], fecha_inicio, fecha_fin });
                         setShowAddForm(false);
                     }}
                 />
-                <div className="flex flex-col gap-2">
-                    <h2 className="font-bold text-lg">Proyectos</h2>
+                <h2 className="font-bold text-lg mb-4">Proyectos</h2>
+                <div className="flex-1">
                     {isLoading ? <p>Cargando...</p> : (
                         <ProjectList
                             projects={projects}
                             onSelectProject={(p) => setSelectedProjectId(p.id)}
                         />
                     )}
-                    <Button onClick={() => setShowAddForm(true)} className="bg-blue-500 text-white hover:bg-blue-600 rounded-md">
-                        + Nuevo Proyecto
-                    </Button>
                 </div>
+                <Button onClick={() => setShowAddForm(true)} className="mt-4 bg-primary text-primary-foreground py-2 rounded-md">
+                    + Nuevo Proyecto
+                </Button>
+                {error && <p className="text-destructive text-xs mt-2 text-center">{error}</p>}
             </div>
 
-            {/* COLUMNA CENTRAL */}
-            <div className="flex-1 w-full">
+            {/* COLUMNA CENTRAL (Más grande) */}
+            <div className="flex flex-col bg-card border rounded-lg p-6 overflow-y-auto shadow-sm ">
                 {!selectedProject ? (
-                    <div className="text-center text-gray-500 mt-10">
+                    <div className="flex items-center justify-center h-full text-muted-foreground">
                         <p>Selecciona un proyecto para ver sus tareas.</p>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-4">
-                        <TaskForm show={showAddTaskForm} onClose={() => setShowAddTaskForm(false)} onAddTask={handleAddTask} />
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center border-b pb-2">
+                            <h2 className="text-xl font-bold">{selectedProject.titulo}</h2>
+                            <Button onClick={() => setShowAddTaskForm(true)} className="bg-primary text-primary-foreground text-sm px-3 py-1 rounded-md">
+                                + Añadir Tarea
+                            </Button>
+                        </div>
+                        <TaskForm show={showAddTaskForm || !!editingTask} onClose={() => { setShowAddTaskForm(false); setEditingTask(undefined); }} onAddTask={handleAddTask} task={editingTask} onEditTask={handleEditTask} />
                         <TaskList
                             tasks={selectedProject.tareas}
                             onSelectTask={setSelectedTask}
                             onCompleteTask={handleCompleteTask}
                             onDeleteTask={handleDeleteTask}
+                            onEditTask={setEditingTask}
                         />
-                        <Button onClick={() => setShowAddTaskForm(true)} className="bg-blue-500 text-white hover:bg-blue-600 text-sm rounded-md">
-                            + Añadir Tarea
-                        </Button>
                     </div>
                 )}
             </div>
 
-            {/* COLUMNA DERECHA */}
-            {selectedProject && (
-                <div className="w-full md:w-80 p-4 border rounded-lg bg-white shadow-sm">
-                    <h3 className="text-md font-bold mb-4 text-gray-800">Detalle del Proyecto</h3>
-                    <div className="space-y-2 text-sm text-gray-600">
-                        <p><strong>Título:</strong> {selectedProject.titulo}</p>
-                        <p><strong>Presupuesto:</strong> ${selectedProject.precio}</p>
-                        <p><strong>Categoría:</strong> <span className="capitalize">{selectedProject.tipo}</span></p>
+            {/* COLUMNA DERECHA (Pequeña) */}
+            <div className="overflow-y-auto">
+                {selectedProject && (
+                    <div className="p-4 border rounded-lg shadow-sm">
+                        <h3 className="text-md font-bold mb-4 text-primary">Detalle del Proyecto</h3>
+                        <div className="space-y-3 text-sm">
+                            <p><strong>Título:</strong> {selectedProject.titulo}</p>
+                            <p><strong>Presupuesto:</strong> ${selectedProject.precio}</p>
+                            <p><strong>Categoría:</strong> <span className="capitalize">{selectedProject.tipo}</span></p>
+                            {selectedProject.fecha_inicio && <p><strong>Fecha de inicio:</strong> {selectedProject.fecha_inicio}</p>}
+                            {selectedProject.fecha_fin && <p><strong>Fecha de fin:</strong> {selectedProject.fecha_fin}</p>}
+                        </div>
+                        <div className="mt-6 pt-4 border-t">
+                            <Button
+                                onClick={delProject}
+                                disabled={isSaving}
+                                className="w-full bg-destructive text-destructive-foreground py-2 rounded-md hover:bg-destructive/90"
+                            >
+                                {isSaving ? "Borrando..." : "Eliminar Proyecto"}
+                            </Button>
+                        </div>
                     </div>
-                    <div className="mt-6 pt-4 border-t">
-                        <Button
-                            onClick={delProject}
-                            disabled={isSaving}
-                            className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-md transition-colors"
-                        >
-                            {isSaving ? "Borrando..." : "Eliminar Proyecto"}
-                        </Button>
-                        {error && <p className="text-red-500 text-xs mt-2 text-center font-medium">{error}</p>}
-                    </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

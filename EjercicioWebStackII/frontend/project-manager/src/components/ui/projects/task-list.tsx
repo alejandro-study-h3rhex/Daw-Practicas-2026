@@ -7,8 +7,8 @@ import { Badge } from "../badge";
 import { Button } from "../common/button";
 import { ScrollArea } from "../scroll-area";
 
-export function TaskList(props: { tasks: Task[], onSelectTask: (task: Task) => void, onCompleteTask: (taskId: number) => void, onDeleteTask: (taskId: number) => void }) {
-    const { tasks, onSelectTask, onCompleteTask, onDeleteTask } = props;
+export function TaskList(props: { tasks: Task[], onSelectTask: (task: Task) => void, onCompleteTask: (taskId: number) => void, onDeleteTask: (taskId: number) => void, onEditTask: (task: Task) => void }) {
+    const { tasks, onSelectTask, onCompleteTask, onDeleteTask, onEditTask } = props;
 
     const getStatusColor = (estado: string) => {
         switch (estado) {
@@ -24,7 +24,7 @@ export function TaskList(props: { tasks: Task[], onSelectTask: (task: Task) => v
     };
 
     return (
-        <ScrollArea className="h-75 w-150 rounded-md border p-4 bg-zinc-400">
+        <ScrollArea className="h-full w-full rounded-md border p-4 bg-zinc-400">
             <div className="flex flex-col items-center gap-3">
                 <h2 className="text-xl mb-4 font-semibold text-center text-gray-950">Tareas</h2>
                 {tasks.map((task) => (
@@ -52,20 +52,32 @@ export function TaskList(props: { tasks: Task[], onSelectTask: (task: Task) => v
                             )}
                             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex justify-end gap-2">
                                 {task.estado !== 'completada' && (
-                                    <Button
-                                        size="sm"
-                                        className="bg-green-500 text-white hover:bg-green-600 text-xs px-3 py-1 rounded"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onCompleteTask(task.id);
-                                        }}
-                                    >
-                                        ✓ Completar
-                                    </Button>
+                                    <>
+                                        <Button
+                                            size="sm"
+                                            className="bg-green-500 text-white hover:bg-green-600 text-xs px-3 py-1 rounded cursor-pointer"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onCompleteTask(task.id);
+                                            }}
+                                        >
+                                            ✓ Completar
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            className="bg-yellow-600 text-white hover:bg-yellow-700 text-xs px-3 py-1 rounded cursor-pointer"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onEditTask(task);
+                                            }}
+                                        >
+                                            Editar
+                                        </Button>
+                                    </>
                                 )}
                                 <Button
                                     size="sm"
-                                    className="bg-red-500 text-white hover:bg-red-600 text-xs px-3 py-1 rounded"
+                                    className="bg-red-500 text-white hover:bg-red-600 text-xs px-3 py-1 rounded cursor-pointer"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         onDeleteTask(task.id);

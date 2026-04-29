@@ -49,5 +49,9 @@ async def read_projects():
     return getListaProjectos()
 
 
+@app.get("/proyectos/{project_id}", response_model=Project)
+async def read_project(project_id: int):
+    
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

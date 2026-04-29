@@ -9,10 +9,11 @@ export function useProjects() {
     const [isSaving , setIsSaving] = useState(false);
     const [isSavedLastChange, setIsSavedLastChange] = useState(false); // Por defecto usamos false, ya que al cargar el proyecto no se ha guardado ningún cambio
     const [error, setError] = useState<string | null>(null);
-    const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL = "http://localhost:8000";
 
     
     const getProjects = async () => {
+        if(isLoading) return;
         setIsLoading(true);
         setError(null);
 
@@ -200,6 +201,18 @@ export function useProjects() {
         await updateProject(updatedProject);
     };
 
+    const updateTaskToProject = async (projectId: number, taskId: number, updatedTask: Partial<Omit<Task, 'id' | 'estado'>>) => {
+        const project = projects.find(p => p.id === projectId);
+        if (!project) return;
+
+        const updatedProject = {
+            ...project,
+            tareas: project.tareas.map(t => t.id === taskId ? { ...t, ...updatedTask } : t)
+        };
+
+        await updateProject(updatedProject);
+    };
+
     return {
         projects,
         selectedProject,
@@ -214,6 +227,7 @@ export function useProjects() {
         delProject,
         addTaskToProject,
         delTaskFromProject,
-        toggleTaskStatus
+        toggleTaskStatus,
+        updateTaskToProject
     };
 }
