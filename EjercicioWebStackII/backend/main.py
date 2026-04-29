@@ -1,17 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+
 from typing import List
-# Asegúrate de que las rutas de importación sean correctas según tu estructura
 from models.Project import Project
 from models.Task import Task
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En desarrollo permitimos todo
+    # Permite cualquier origen (incluyendo tu IP 172.18.0.2)
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Permite GET, POST, PUT, DELETE, etc.
+    allow_headers=["*"],  # Permite todos los headers (incluyendo Content-Type)
 )
 
 # Definimos los datos de prueba
@@ -45,3 +47,7 @@ def getListaProjectos() -> List[Project]:
 async def read_projects():
     # Llamamos a la función y FastAPI la convertirá a JSON automáticamente
     return getListaProjectos()
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

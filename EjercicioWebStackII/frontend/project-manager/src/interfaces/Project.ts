@@ -6,6 +6,7 @@ interface Project {
   precio: number;
   tipo: 'web' | 'mobile' | 'desktop' | 'otro';
   fecha_inicio?: string;
+  fecha_fin?: string;
   tareas: Task[];
 }
 
